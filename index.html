@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WorkoutAgent — AI Personal Trainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #111111;
+      --text: #f5f5f5;
+      --muted: #a5a5a5;
+      --line: #262626;
+      --accent: #4f6ef7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.35;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-frame {
+      position: relative;
+      border-left: 2px solid var(--line);
+      border-right: 2px solid var(--line);
+      margin: 0 auto;
+      max-width: 1400px;
+      min-height: 100vh;
+    }
+
+    .site-frame::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 4px;
+      opacity: 0.18;
+      z-index: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(6px);
+      border-bottom: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+    }
+
+    .brand {
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-size: 0.95rem;
+    }
+
+    .brand b {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--text);
+      background: var(--text);
+      color: var(--bg);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      padding: 11px 16px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease;
+      box-shadow: 6px 6px 0 #000;
+    }
+
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 10px 10px 0 var(--accent);
+    }
+
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: calc(100vh - 62px);
+      border-bottom: 2px solid var(--line);
+      padding: clamp(26px, 4vw, 56px) clamp(16px, 4vw, 44px) clamp(34px, 5vw, 58px);
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.55fr);
+      gap: clamp(14px, 3vw, 32px);
+      align-items: end;
+      min-height: 100%;
+    }
+
+    .kicker {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: clamp(14px, 2vw, 22px);
+    }
+
+    .hero-title {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: clamp(4.8rem, 15.5vw, 13rem);
+      line-height: 0.86;
+      letter-spacing: 0.015em;
+      font-weight: 400;
+      margin-left: -0.02em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-title em {
+      color: var(--accent);
+      font-style: normal;
+      display: block;
+      transform: translateX(9.5vw);
+    }
+
+    .hero-sub {
+      margin-top: clamp(14px, 2.4vw, 24px);
+      max-width: 560px;
+      color: var(--muted);
+      font-size: clamp(0.95rem, 1.7vw, 1.1rem);
+    }
+
+    .hero-cta-wrap {
+      margin-top: clamp(18px, 3vw, 30px);
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-note {
+      font-size: 0.76rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .hero-side {
+      align-self: center;
+      justify-self: end;
+      width: min(360px, 100%);
+      border: 2px solid var(--text);
+      background: var(--panel);
+      padding: 18px;
+      transform: rotate(-3deg);
+      box-shadow: 10px 10px 0 var(--accent);
+      position: relative;
+      z-index: 3;
+    }
+
+    .hero-side h3 {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 2.1rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 8px;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .hero-side p {
+      font-size: 0.9rem;
+      color: #d4d4d4;
+      margin-bottom: 12px;
+    }
+
+    .hero-side ul {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero-side li {
+      border: 2px solid var(--line);
+      padding: 8px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+
+    .shape {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .shape-a {
+      top: 12%;
+      right: 18%;
+      width: clamp(130px, 22vw, 320px);
+      height: clamp(30px, 5vw, 74px);
+      background: var(--accent);
+      transform: rotate(-14deg);
+    }
+
+    .shape-b {
+      bottom: 9%;
+      left: -32px;
+      width: clamp(120px, 17vw, 240px);
+      height: clamp(120px, 16vw, 220px);
+      border: 2px solid var(--accent);
+      transform: rotate(16deg);
+    }
+
+    .shape-c {
+      top: 44%;
+      right: -44px;
+      width: 140px;
+      height: 140px;
+      border: 2px solid var(--line);
+      background: linear-gradient(135deg, transparent 50%, rgba(79, 110, 247, 0.25) 50%);
+      transform: rotate(22deg);
+    }
+
+    .stats {
+      border-bottom: 2px solid var(--line);
+      padding: clamp(18px, 2.2vw, 26px);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      background: #0d0d0d;
+    }
+
+    .stat {
+      border: 2px solid var(--line);
+      padding: 14px;
+      position: relative;
+      background: #0f0f0f;
+      min-height: 108px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .stat:nth-child(2),
+    .stat:nth-child(4) {
+      transform: translateY(16px);
+    }
+
+    .stat::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--accent);
+    }
+
+    .stat-num {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: clamp(2rem, 7vw, 4.2rem);
+      line-height: 0.9;
+      letter-spacing: 0.03em;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .stat-label {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.73rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      font-weight: 700;
+    }
+
+    .section-head {
+      padding: clamp(36px, 6vw, 80px) clamp(16px, 4vw, 44px) 0;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .section-index {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.17em;
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .section-title {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: clamp(2.6rem, 8.2vw, 6rem);
+      line-height: 0.9;
+      letter-spacing: 0.03em;
+      margin: 8px 0 clamp(18px, 2vw, 28px);
+      max-width: 900px;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .features {
+      padding: clamp(18px, 2.4vw, 34px) clamp(16px, 4vw, 44px) clamp(40px, 5vw, 70px);
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 10px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .feature-card {
+      border: 2px solid var(--line);
+      background: #101010;
+      padding: 18px;
+      min-height: 185px;
+      position: relative;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .feature-card::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: -2px;
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      clip-path: polygon(100% 0, 0 0, 100% 100%);
+      opacity: 0.9;
+    }
+
+    .feature-card:nth-child(1) { grid-column: span 5; }
+    .feature-card:nth-child(2) { grid-column: span 7; }
+    .feature-card:nth-child(3) { grid-column: span 4; }
+    .feature-card:nth-child(4) { grid-column: span 4; }
+    .feature-card:nth-child(5) { grid-column: span 4; }
+    .feature-card:nth-child(6) { grid-column: span 12; }
+
+    .feature-icon {
+      width: 34px;
+      height: 34px;
+      border: 2px solid var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      font-weight: 800;
+      color: var(--accent);
+      background: #0b0b0b;
+    }
+
+    .feature-title {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 2rem;
+      line-height: 0.95;
+      letter-spacing: 0.035em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      font-weight: 400;
+    }
+
+    .feature-desc {
+      color: #c5c5c5;
+      font-size: 0.9rem;
+      max-width: 62ch;
+    }
+
+    .pipeline-wrap {
+      border-bottom: 2px solid var(--line);
+      padding-bottom: clamp(42px, 6vw, 74px);
+      background: linear-gradient(0deg, rgba(79, 110, 247, 0.08), rgba(79, 110, 247, 0.08)) no-repeat;
+      background-size: 100% 2px;
+      background-position: 0 0;
+    }
+
+    .pipeline {
+      padding: clamp(20px, 2.6vw, 36px) clamp(16px, 4vw, 44px) 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      position: relative;
+    }
+
+    .pipeline::before {
+      content: "";
+      position: absolute;
+      left: 44px;
+      right: 44px;
+      top: 50%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--line), transparent);
+      transform: translateY(-1px);
+      z-index: 0;
+    }
+
+    .agent {
+      position: relative;
+      z-index: 1;
+      border: 2px solid var(--line);
+      background: #0f0f0f;
+      padding: 14px;
+      min-height: 136px;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .agent:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .agent-num {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 1.55rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      line-height: 0.9;
+      font-weight: 400;
+    }
+
+    .agent-name {
+      margin-top: 7px;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .agent-role {
+      margin-top: 8px;
+      color: #c2c2c2;
+      font-size: 0.8rem;
+      line-height: 1.35;
+    }
+
+    .cta {
+      padding: clamp(46px, 9vw, 120px) clamp(16px, 4vw, 44px);
+      border-bottom: 2px solid var(--line);
+      background:
+        linear-gradient(125deg, rgba(79, 110, 247, 0.22) 0 18%, transparent 18% 100%),
+        linear-gradient(300deg, rgba(79, 110, 247, 0.16) 0 10%, transparent 10% 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta h2 {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: clamp(3rem, 11vw, 8rem);
+      line-height: 0.85;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      max-width: 900px;
+      font-weight: 400;
+    }
+
+    .cta p {
+      margin: 14px 0 24px;
+      color: #d0d0d0;
+      max-width: 540px;
+      font-size: 1rem;
+    }
+
+    .footer {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .reveal {
+      opacity: 0;
+      transition: transform 0.95s cubic-bezier(0.18, 1, 0.25, 1), opacity 0.65s ease;
+      will-change: transform, opacity;
+    }
+
+    .reveal[data-slide="left"] { transform: translateX(-120px) rotate(-3deg); }
+    .reveal[data-slide="right"] { transform: translateX(140px) rotate(3deg); }
+    .reveal[data-slide="up"] { transform: translateY(100px) rotate(2deg); }
+    .reveal[data-slide="down"] { transform: translateY(-90px) rotate(-2deg); }
+    .reveal[data-slide="diag"] { transform: translate(-80px, 80px) rotate(5deg); }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-title em { transform: translateX(0); }
+      .hero-side { justify-self: start; transform: rotate(0deg); margin-top: 8px; }
+      .shape-a { right: 6%; top: 8%; }
+      .shape-b { left: auto; right: -38px; bottom: 14%; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat:nth-child(2),
+      .stat:nth-child(4) { transform: translateY(0); }
+      .feature-card:nth-child(n) { grid-column: span 6; }
+      .feature-card:nth-child(6) { grid-column: span 12; }
+      .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pipeline::before { display: none; }
+    }
+
+    @media (max-width: 680px) {
+      .topbar { padding: 12px 14px; }
+      .btn { font-size: 0.72rem; padding: 10px 12px; }
+      .section-head { padding-left: 14px; padding-right: 14px; }
+      .features,
+      .pipeline,
+      .cta,
+      .hero { padding-left: 14px; padding-right: 14px; }
+      .feature-card:nth-child(n) { grid-column: span 12; }
+      .stats { grid-template-columns: 1fr; }
+      .pipeline { grid-template-columns: 1fr; }
+      .footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-frame">
+    <header class="topbar">
+      <div class="brand">Workout<b>Agent</b></div>
+      <a class="btn" href="#cta">Get Started</a>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="shape shape-a"></div>
+      <div class="shape shape-b"></div>
+      <div class="shape shape-c"></div>
+
+      <div class="hero-grid">
+        <div>
+          <p class="kicker reveal" data-slide="down">Multi-Agent AI System</p>
+          <h1 class="hero-title reveal" data-slide="left">
+            Your AI
+            <em>Personal</em>
+            Trainer
+          </h1>
+          <p class="hero-sub reveal" data-slide="right">
+            A multi-agent system that builds safe, personalized workout plans.
+          </p>
+          <div class="hero-cta-wrap reveal" data-slide="up">
+            <a class="btn" href="#features">Start Training</a>
+            <span class="hero-note">8 agents. one coordinated plan.</span>
+          </div>
+        </div>
+
+        <aside class="hero-side reveal" data-slide="diag">
+          <h3>System Readout</h3>
+          <p>Every generated plan runs through a hard safety gate before export.</p>
+          <ul>
+            <li>Constraint-Aware</li>
+            <li>Week-by-Week Progression</li>
+            <li>Explainable Decisions</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="stats" id="stats">
+      <article class="stat reveal" data-slide="left" data-delay="0.02">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Specialized Agents</div>
+      </article>
+      <article class="stat reveal" data-slide="up" data-delay="0.08">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Safety Validated</div>
+      </article>
+      <article class="stat reveal" data-slide="down" data-delay="0.14">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Personalization</div>
+      </article>
+      <article class="stat reveal" data-slide="right" data-delay="0.2">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Generic Plans</div>
+      </article>
+    </section>
+
+    <section class="section-head" id="features-head">
+      <p class="section-index reveal" data-slide="left">Why WorkoutAgent</p>
+      <h2 class="section-title reveal" data-slide="right">Built Different. Trained Smarter.</h2>
+    </section>
+
+    <section class="features" id="features">
+      <article class="feature-card reveal" data-slide="left" data-delay="0.02">
+        <div class="feature-icon">01</div>
+        <h3 class="feature-title">Safety First</h3>
+        <p class="feature-desc">A dedicated constraint-checking agent filters every exercise against your injuries and contraindications before anything reaches you.</p>
+      </article>
+
+      <article class="feature-card reveal" data-slide="up" data-delay="0.08">
+        <div class="feature-icon">02</div>
+        <h3 class="feature-title">8 Specialized Agents</h3>
+        <p class="feature-desc">Each agent owns one responsibility: intake, constraints, selection, scheduling, progression, risk, explainability, and export.</p>
+      </article>
+
+      <article class="feature-card reveal" data-slide="right" data-delay="0.14">
+        <div class="feature-icon">03</div>
+        <h3 class="feature-title">Long-term Progression</h3>
+        <p class="feature-desc">Week-by-week plan evolution with logical volume and intensity changes built for consistency, not chaos.</p>
+      </article>
+
+      <article class="feature-card reveal" data-slide="down" data-delay="0.2">
+        <div class="feature-icon">04</div>
+        <h3 class="feature-title">Transparent Reasoning</h3>
+        <p class="feature-desc">Every plan decision is explainable: what was selected, what was rejected, and why.</p>
+      </article>
+
+      <article class="feature-card reveal" data-slide="diag" data-delay="0.26">
+        <div class="feature-icon">05</div>
+        <h3 class="feature-title">RAG-Powered Knowledge</h3>
+        <p class="feature-desc">Exercise choices come from a curated database retrieval layer, not prompt-only memory guesses.</p>
+      </article>
+
+      <article class="feature-card reveal" data-slide="up" data-delay="0.32">
+        <div class="feature-icon">06</div>
+        <h3 class="feature-title">Feedback Loop</h3>
+        <p class="feature-desc">Session feedback feeds the next cycle so progression adapts to your real performance and recovery.</p>
+      </article>
+    </section>
+
+    <section class="pipeline-wrap" id="pipeline">
+      <section class="section-head">
+        <p class="section-index reveal" data-slide="right">Under the Hood</p>
+        <h2 class="section-title reveal" data-slide="left">The 8-Agent Pipeline</h2>
+      </section>
+
+      <div class="pipeline">
+        <article class="agent reveal" data-slide="left" data-delay="0.02"><div class="agent-num">01</div><div class="agent-name">Information Receiver</div><p class="agent-role">Collects goals, metrics and schedule.</p></article>
+        <article class="agent reveal" data-slide="up" data-delay="0.06"><div class="agent-num">02</div><div class="agent-name">Constraint Receiver</div><p class="agent-role">Captures injuries and conditions.</p></article>
+        <article class="agent reveal" data-slide="down" data-delay="0.1"><div class="agent-num">03</div><div class="agent-name">Exercise Selector</div><p class="agent-role">Filters by goals and contraindications.</p></article>
+        <article class="agent reveal" data-slide="right" data-delay="0.14"><div class="agent-num">04</div><div class="agent-name">Schedule Maker</div><p class="agent-role">Distributes sessions and recovery.</p></article>
+        <article class="agent reveal" data-slide="diag" data-delay="0.18"><div class="agent-num">05</div><div class="agent-name">Progress Planner</div><p class="agent-role">Sets load and intensity targets.</p></article>
+        <article class="agent reveal" data-slide="left" data-delay="0.22"><div class="agent-num">06</div><div class="agent-name">Risk Assessment</div><p class="agent-role">Hard safety gate for full validation.</p></article>
+        <article class="agent reveal" data-slide="right" data-delay="0.26"><div class="agent-num">07</div><div class="agent-name">Explainability</div><p class="agent-role">Justifies every recommendation.</p></article>
+        <article class="agent reveal" data-slide="up" data-delay="0.3"><div class="agent-num">08</div><div class="agent-name">Plan Export</div><p class="agent-role">Assembles final structured output.</p></article>
+      </div>
+    </section>
+
+    <section class="cta" id="cta">
+      <h2 class="reveal" data-slide="left">Ready to train smarter?</h2>
+      <p class="reveal" data-slide="right">Generate your first AI-powered workout plan in minutes.</p>
+      <a class="btn reveal" data-slide="up" href="#top">Get Your Plan</a>
+    </section>
+
+    <footer class="footer">
+      <div class="brand">Workout<b>Agent</b></div>
+      <div>Built with LangGraph + FastAPI</div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
+            const delay = entry.target.getAttribute("data-delay") || "0";
+            entry.target.style.transitionDelay = delay + "s";
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.17, rootMargin: "0px 0px -40px 0px" }
+      );
+
+      document.querySelectorAll(".reveal").forEach((node) => observer.observe(node));
+    })();
+  </script>
+</body>
+</html>

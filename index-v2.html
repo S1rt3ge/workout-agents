@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WorkoutAgent - Editorial Variant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #111111;
+      --text: #f1f1f1;
+      --muted: #8d8d8d;
+      --line: #2a2a2a;
+      --accent: #4f6ef7;
+      --mono: "Courier New", Courier, monospace;
+      --display: "Bebas Neue", Impact, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site {
+      max-width: 1520px;
+      margin: 0 auto;
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(10, 10, 10, 0.96);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+    }
+
+    .brand {
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #d6d6d6;
+    }
+
+    .brand strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .topbar .meta {
+      font-family: var(--mono);
+      font-size: 0.67rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7e7e7e;
+    }
+
+    .ghost-btn {
+      border: 1px solid var(--text);
+      color: var(--text);
+      padding: 8px 12px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+
+    .ghost-btn:hover {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    section {
+      position: relative;
+      border-top: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .section-rail {
+      position: absolute;
+      left: 6px;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(-90deg);
+      transform-origin: center;
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: #6e6e6e;
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    .watermark {
+      position: absolute;
+      right: 2.5vw;
+      top: 1.4vw;
+      font-family: var(--mono);
+      font-size: clamp(6rem, 18vw, 16rem);
+      line-height: 0.8;
+      color: rgba(255, 255, 255, 0.035);
+      font-weight: 700;
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+    }
+
+    .section-inner {
+      position: relative;
+      z-index: 2;
+      padding-left: clamp(34px, 4vw, 76px);
+      padding-right: clamp(14px, 3vw, 38px);
+    }
+
+    .hero {
+      min-height: calc(100vh - 46px);
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero .section-inner {
+      width: 100%;
+      padding-top: clamp(28px, 7vh, 90px);
+      padding-bottom: clamp(24px, 6vh, 74px);
+    }
+
+    .hero-meta {
+      font-family: var(--mono);
+      font-size: clamp(0.58rem, 0.9vw, 0.74rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #7f7f7f;
+      margin-bottom: clamp(10px, 2vw, 18px);
+    }
+
+    .hero-title {
+      font-family: var(--display);
+      text-transform: uppercase;
+      line-height: 0.82;
+      font-size: clamp(5.2rem, 18vw, 17rem);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      width: min(96%, 1500px);
+      margin-left: -0.01em;
+    }
+
+    .hero-title .line {
+      display: block;
+    }
+
+    .hero-title .line.shift {
+      transform: translateX(14.5vw);
+    }
+
+    .hero-title .tiny {
+      font-family: var(--mono);
+      font-size: clamp(0.62rem, 1vw, 0.86rem);
+      letter-spacing: 0.2em;
+      color: #898989;
+      vertical-align: middle;
+      margin-left: 0.8vw;
+    }
+
+    .hero-title .accent-word {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      margin-top: clamp(10px, 1.7vw, 18px);
+      width: min(840px, 88%);
+      color: #b5b5b5;
+      font-size: clamp(0.9rem, 1.4vw, 1.08rem);
+      line-height: 1.46;
+    }
+
+    .hero-actions {
+      margin-top: clamp(16px, 2.4vw, 26px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-cta {
+      border: 1px solid var(--text);
+      background: var(--text);
+      color: var(--bg);
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .hero-note {
+      font-family: var(--mono);
+      font-size: 0.63rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7d7d7d;
+    }
+
+    .stats {
+      border-bottom: 1px solid var(--line);
+      background: #0e0e0e;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-left: 1px solid var(--line);
+      margin-left: clamp(34px, 4vw, 76px);
+    }
+
+    .stat {
+      min-height: 140px;
+      border-right: 1px solid var(--line);
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+
+    .stat:nth-child(2) .stat-value {
+      color: var(--accent);
+    }
+
+    .stat-value {
+      font-family: var(--display);
+      font-size: clamp(2.4rem, 8vw, 5.2rem);
+      line-height: 0.88;
+      letter-spacing: 0.02em;
+      font-weight: 400;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+      color: #878787;
+    }
+
+    .features {
+      border-bottom: 1px solid var(--line);
+      padding-top: clamp(20px, 3vw, 36px);
+      padding-bottom: clamp(36px, 4vw, 54px);
+    }
+
+    .features .section-headline {
+      margin-left: clamp(34px, 4vw, 76px);
+      margin-right: clamp(14px, 3vw, 38px);
+      margin-bottom: clamp(16px, 2vw, 22px);
+    }
+
+    .micro-kicker {
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.19em;
+      color: #7a7a7a;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .features-title {
+      font-family: var(--display);
+      font-size: clamp(2.5rem, 7.5vw, 6rem);
+      text-transform: uppercase;
+      line-height: 0.88;
+      font-weight: 400;
+      letter-spacing: 0.025em;
+    }
+
+    .features-title .small {
+      font-family: var(--mono);
+      font-size: clamp(0.62rem, 0.95vw, 0.82rem);
+      letter-spacing: 0.22em;
+      color: #767676;
+      vertical-align: baseline;
+      margin-left: 0.6vw;
+    }
+
+    .feature-table-wrap {
+      margin-left: clamp(34px, 4vw, 76px);
+      margin-right: clamp(14px, 3vw, 38px);
+      border: 1px solid var(--line);
+      position: relative;
+      background: #0f0f0f;
+    }
+
+    .feature-table-wrap::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1px;
+      height: 100%;
+      background: var(--accent);
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 88px minmax(180px, 1.2fr) minmax(340px, 2.6fr) minmax(200px, 1.4fr);
+      gap: 0;
+      border-top: 1px solid var(--line);
+      min-height: 94px;
+      align-items: stretch;
+    }
+
+    .feature-row:first-child {
+      border-top: none;
+      min-height: 44px;
+      background: #131313;
+    }
+
+    .feature-cell {
+      border-left: 1px solid var(--line);
+      padding: 11px 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .feature-cell:first-child {
+      border-left: none;
+      justify-content: center;
+    }
+
+    .feature-row.header .feature-cell {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #8a8a8a;
+      font-weight: 700;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .feature-id {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #8a8a8a;
+      font-weight: 700;
+    }
+
+    .feature-name {
+      font-family: var(--display);
+      font-size: 1.65rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      line-height: 0.92;
+      font-weight: 400;
+    }
+
+    .feature-detail {
+      color: #c6c6c6;
+      font-size: 0.87rem;
+      line-height: 1.38;
+      max-width: 72ch;
+    }
+
+    .feature-impact {
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      line-height: 1.45;
+      text-transform: uppercase;
+      color: #9a9a9a;
+    }
+
+    .pipeline {
+      border-bottom: 1px solid var(--line);
+      padding-top: clamp(20px, 3vw, 36px);
+      padding-bottom: clamp(34px, 5vw, 60px);
+      background: #0d0d0d;
+    }
+
+    .pipeline .section-headline {
+      margin-left: clamp(34px, 4vw, 76px);
+      margin-right: clamp(14px, 3vw, 38px);
+      margin-bottom: clamp(16px, 2vw, 24px);
+    }
+
+    .pipeline-title {
+      font-family: var(--display);
+      font-size: clamp(2.4rem, 7.1vw, 5.8rem);
+      line-height: 0.88;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 400;
+    }
+
+    .timeline {
+      margin-left: clamp(34px, 4vw, 76px);
+      margin-right: clamp(14px, 3vw, 38px);
+      border-left: 1px solid var(--accent);
+      position: relative;
+      padding-left: 24px;
+      display: grid;
+      gap: 0;
+    }
+
+    .timeline-item {
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 90px minmax(220px, 1.3fr) minmax(260px, 2fr);
+      gap: 0;
+      min-height: 88px;
+      align-items: center;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -30px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border: 1px solid var(--accent);
+      background: #0d0d0d;
+      transform: translateY(-50%);
+    }
+
+    .timeline-step {
+      font-family: var(--mono);
+      font-size: 0.69rem;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+      color: #8a8a8a;
+      padding-right: 12px;
+    }
+
+    .timeline-name {
+      font-family: var(--display);
+      font-size: 1.54rem;
+      line-height: 0.93;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 400;
+      padding-right: 10px;
+    }
+
+    .timeline-role {
+      font-size: 0.84rem;
+      color: #bcbcbc;
+      line-height: 1.36;
+      padding-right: 6px;
+    }
+
+    .cta {
+      border-bottom: 1px solid var(--line);
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      padding-top: clamp(24px, 4vw, 54px);
+      padding-bottom: clamp(28px, 4.5vw, 70px);
+    }
+
+    .cta .section-inner {
+      width: 100%;
+    }
+
+    .cta-title {
+      font-family: var(--display);
+      font-size: clamp(4rem, 13.5vw, 11rem);
+      line-height: 0.82;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      max-width: 1100px;
+      font-weight: 400;
+    }
+
+    .cta-title .tiny {
+      font-family: var(--mono);
+      font-size: clamp(0.6rem, 1vw, 0.86rem);
+      letter-spacing: 0.22em;
+      color: #878787;
+      margin-left: 0.65vw;
+      vertical-align: baseline;
+    }
+
+    .cta-sub {
+      margin-top: 10px;
+      color: #b6b6b6;
+      max-width: 640px;
+      font-size: 0.94rem;
+      line-height: 1.45;
+    }
+
+    .cta-actions {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .cta-btn {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 0.67rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .cta-note {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.17em;
+      color: #7f7f7f;
+      text-transform: uppercase;
+    }
+
+    .footer {
+      border-top: 1px solid var(--line);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7e7e7e;
+    }
+
+    .reveal {
+      opacity: 0;
+      transition: transform 0.85s cubic-bezier(0.15, 1, 0.2, 1), opacity 0.62s ease;
+      will-change: transform, opacity;
+    }
+
+    .reveal[data-anim="left"] { transform: translateX(-130px); }
+    .reveal[data-anim="right"] { transform: translateX(150px); }
+    .reveal[data-anim="up"] { transform: translateY(90px); }
+    .reveal[data-anim="down"] { transform: translateY(-85px); }
+    .reveal[data-anim="diag"] { transform: translate(-80px, 82px); }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+
+    @media (max-width: 1200px) {
+      .hero-title .line.shift { transform: translateX(9vw); }
+      .feature-row { grid-template-columns: 72px minmax(170px, 1fr) minmax(260px, 2fr) minmax(160px, 1fr); }
+      .timeline-item { grid-template-columns: 72px minmax(180px, 1fr) minmax(200px, 1.5fr); }
+    }
+
+    @media (max-width: 980px) {
+      .section-rail {
+        position: static;
+        transform: none;
+        display: block;
+        margin: 0 0 6px clamp(34px, 4vw, 76px);
+      }
+
+      .watermark { font-size: clamp(5rem, 26vw, 11rem); top: 14px; right: 10px; }
+      .hero-title .line.shift { transform: translateX(0); }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .feature-row {
+        grid-template-columns: 64px minmax(0, 1fr);
+      }
+      .feature-row .feature-cell:nth-child(3),
+      .feature-row .feature-cell:nth-child(4) {
+        border-top: 1px solid var(--line);
+      }
+      .feature-row.header {
+        display: none;
+      }
+      .feature-row {
+        min-height: auto;
+      }
+      .feature-row .feature-cell {
+        min-height: 58px;
+      }
+      .feature-row .feature-cell:nth-child(1) {
+        grid-row: span 3;
+      }
+      .timeline-item {
+        grid-template-columns: 62px minmax(0, 1fr);
+      }
+      .timeline-role {
+        grid-column: 2;
+        padding-bottom: 10px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .topbar {
+        padding: 11px 12px;
+      }
+
+      .topbar .meta {
+        display: none;
+      }
+
+      .hero .section-inner,
+      .cta .section-inner {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .section-rail,
+      .features .section-headline,
+      .feature-table-wrap,
+      .pipeline .section-headline,
+      .timeline,
+      .stats-grid {
+        margin-left: 14px;
+        margin-right: 14px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+        border-left: 1px solid var(--line);
+      }
+
+      .feature-row {
+        grid-template-columns: 52px minmax(0, 1fr);
+      }
+
+      .timeline-item {
+        grid-template-columns: 52px minmax(0, 1fr);
+      }
+
+      .footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <header class="topbar">
+      <div class="brand">Workout<strong>Agent</strong></div>
+      <div class="meta">Edition 2026 / Multi-Agent Planner</div>
+      <a href="#cta" class="ghost-btn">Get Started</a>
+    </header>
+
+    <section class="hero" id="hero">
+      <div class="section-rail">01 / HERO</div>
+      <div class="watermark" aria-hidden="true">01</div>
+      <div class="section-inner">
+        <p class="hero-meta reveal" data-anim="down">Multi-Agent AI System / Safety Validated Pipeline</p>
+
+        <h1 class="hero-title reveal" data-anim="left">
+          <span class="line">Your AI <span class="tiny">EDITORIAL BUILD</span></span>
+          <span class="line shift"><span class="accent-word">Personal</span> Trainer</span>
+        </h1>
+
+        <p class="hero-sub reveal" data-anim="right">
+          A multi-agent system that builds safe, personalized workout plans.
+        </p>
+
+        <div class="hero-actions reveal" data-anim="up">
+          <a class="hero-cta" href="#features">Start Training</a>
+          <span class="hero-note">8 specialized agents / one coherent plan</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats" id="stats">
+      <div class="section-rail">02 / STATS</div>
+      <div class="watermark" aria-hidden="true">02</div>
+      <div class="stats-grid">
+        <article class="stat reveal" data-anim="left" data-delay="0.03">
+          <div class="stat-value">8</div>
+          <p class="stat-label">Specialized Agents</p>
+        </article>
+        <article class="stat reveal" data-anim="up" data-delay="0.09">
+          <div class="stat-value">100%</div>
+          <p class="stat-label">Safety Validated</p>
+        </article>
+        <article class="stat reveal" data-anim="down" data-delay="0.15">
+          <div class="stat-value">INF</div>
+          <p class="stat-label">Personalization</p>
+        </article>
+        <article class="stat reveal" data-anim="right" data-delay="0.21">
+          <div class="stat-value">0</div>
+          <p class="stat-label">Generic Plans</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="section-rail">03 / FEATURES</div>
+      <div class="watermark" aria-hidden="true">03</div>
+
+      <div class="section-headline">
+        <p class="micro-kicker reveal" data-anim="left">Why WorkoutAgent</p>
+        <h2 class="features-title reveal" data-anim="right">
+          Built Different <span class="small">NOT GENERIC</span><br />Trained Smarter
+        </h2>
+      </div>
+
+      <div class="feature-table-wrap reveal" data-anim="up">
+        <div class="feature-row header">
+          <div class="feature-cell">ID</div>
+          <div class="feature-cell">Capability</div>
+          <div class="feature-cell">Description</div>
+          <div class="feature-cell">Result</div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-cell"><span class="feature-id">F-01</span></div>
+          <div class="feature-cell"><h3 class="feature-name">Safety First</h3></div>
+          <div class="feature-cell"><p class="feature-detail">A dedicated constraint-checking agent filters every exercise against your medical history, injuries, and contraindications before anything reaches you.</p></div>
+          <div class="feature-cell"><p class="feature-impact">Unsafe movements are blocked early.</p></div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-cell"><span class="feature-id">F-02</span></div>
+          <div class="feature-cell"><h3 class="feature-name">8 Specialized Agents</h3></div>
+          <div class="feature-cell"><p class="feature-detail">Each agent is an expert in one domain: exercise selection, scheduling, progression, risk assessment, and export.</p></div>
+          <div class="feature-cell"><p class="feature-impact">Focused reasoning over general guesswork.</p></div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-cell"><span class="feature-id">F-03</span></div>
+          <div class="feature-cell"><h3 class="feature-name">Long-term Progression</h3></div>
+          <div class="feature-cell"><p class="feature-detail">Week-by-week plans evolve with load, volume, and intensity targets that move forward logically, not randomly.</p></div>
+          <div class="feature-cell"><p class="feature-impact">Sustainable progression structure.</p></div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-cell"><span class="feature-id">F-04</span></div>
+          <div class="feature-cell"><h3 class="feature-name">Transparent Reasoning</h3></div>
+          <div class="feature-cell"><p class="feature-detail">Every decision is explained in plain language: what was selected, what was removed, and why each tradeoff was made.</p></div>
+          <div class="feature-cell"><p class="feature-impact">Human-readable plan logic.</p></div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-cell"><span class="feature-id">F-05</span></div>
+          <div class="feature-cell"><h3 class="feature-name">RAG-powered Knowledge</h3></div>
+          <div class="feature-cell"><p class="feature-detail">Agents retrieve from a curated exercise database at runtime rather than inventing movements from memory.</p></div>
+          <div class="feature-cell"><p class="feature-impact">Grounded selection process.</p></div>
+        </div>
+
+        <div class="feature-row">
+          <div class="feature-cell"><span class="feature-id">F-06</span></div>
+          <div class="feature-cell"><h3 class="feature-name">Feedback Loop</h3></div>
+          <div class="feature-cell"><p class="feature-detail">After each session, completion and perceived difficulty can be logged so the next week adapts to your real-world response.</p></div>
+          <div class="feature-cell"><p class="feature-impact">Plans adapt with use, not assumptions.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pipeline" id="pipeline">
+      <div class="section-rail">04 / PIPELINE</div>
+      <div class="watermark" aria-hidden="true">04</div>
+
+      <div class="section-headline">
+        <p class="micro-kicker reveal" data-anim="right">Under the Hood</p>
+        <h2 class="pipeline-title reveal" data-anim="left">The 8-Agent Pipeline</h2>
+      </div>
+
+      <div class="timeline">
+        <article class="timeline-item reveal" data-anim="left" data-delay="0.03">
+          <div class="timeline-step">01</div>
+          <div class="timeline-name">Information Receiver</div>
+          <p class="timeline-role">Collects goals, metrics and schedule.</p>
+        </article>
+        <article class="timeline-item reveal" data-anim="right" data-delay="0.07">
+          <div class="timeline-step">02</div>
+          <div class="timeline-name">Constraint Receiver</div>
+          <p class="timeline-role">Captures injuries and conditions.</p>
+        </article>
+        <article class="timeline-item reveal" data-anim="up" data-delay="0.11">
+          <div class="timeline-step">03</div>
+          <div class="timeline-name">Exercise Selector</div>
+          <p class="timeline-role">Filters by goals and contraindications.</p>
+        </article>
+        <article class="timeline-item reveal" data-anim="down" data-delay="0.15">
+          <div class="timeline-step">04</div>
+          <div class="timeline-name">Schedule Maker</div>
+          <p class="timeline-role">Distributes sessions and recovery.</p>
+        </article>
+        <article class="timeline-item reveal" data-anim="diag" data-delay="0.19">
+          <div class="timeline-step">05</div>
+          <div class="timeline-name">Progress Planner</div>
+          <p class="timeline-role">Sets load and intensity targets.</p>
+        </article>
+        <article class="timeline-item reveal" data-anim="left" data-delay="0.23">
+          <div class="timeline-step">06</div>
+          <div class="timeline-name">Risk Assessment</div>
+          <p class="timeline-role">Hard safety gate for full plan validation.</p>
+        </article>
+        <article class="timeline-item reveal" data-anim="right" data-delay="0.27">
+          <div class="timeline-step">07</div>
+          <div class="timeline-name">Explainability</div>
+          <p class="timeline-role">Justifies every recommendation.</p>
+        </article>
+        <article class="timeline-item reveal" data-anim="up" data-delay="0.31">
+          <div class="timeline-step">08</div>
+          <div class="timeline-name">Plan Export</div>
+          <p class="timeline-role">Assembles final structured output.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="cta" id="cta">
+      <div class="section-rail">05 / CTA</div>
+      <div class="watermark" aria-hidden="true">05</div>
+
+      <div class="section-inner">
+        <h2 class="cta-title reveal" data-anim="left">
+          Ready to train smarter?<span class="tiny">BEGIN NOW</span>
+        </h2>
+        <p class="cta-sub reveal" data-anim="right">Generate your first AI-powered workout plan in minutes.</p>
+        <div class="cta-actions reveal" data-anim="up">
+          <a href="#hero" class="cta-btn">Get Your Plan</a>
+          <span class="cta-note">No generic templates / fully constraint-aware</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>WorkoutAgent / LangGraph + FastAPI</div>
+      <div>Editorial Variant 02</div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const nodes = document.querySelectorAll(".reveal");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
+            const delay = entry.target.getAttribute("data-delay") || "0";
+            entry.target.style.transitionDelay = delay + "s";
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          });
+        },
+        {
+          threshold: 0.16,
+          rootMargin: "0px 0px -40px 0px",
+        }
+      );
+
+      nodes.forEach((node) => observer.observe(node));
+    })();
+  </script>
+</body>
+</html>

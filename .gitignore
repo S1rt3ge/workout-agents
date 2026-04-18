@@ -1,0 +1,21 @@
+.env
+*.log
+*.out.log
+*.err.log
+*.zip
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+dist/
+build/
+
+# Frontend
+b_sCMmptobhu2/node_modules/
+b_sCMmptobhu2/.next/
+b_sCMmptobhu2/.env.local
+
+# OS/editor
+.DS_Store
+Thumbs.db
