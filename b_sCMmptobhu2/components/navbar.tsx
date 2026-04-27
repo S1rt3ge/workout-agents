@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { Activity } from "lucide-react"
 
@@ -22,7 +23,7 @@ export function Navbar() {
         </div>
 
         <nav className="hidden items-center gap-8 md:flex">
-          {["Features", "Pipeline", "Pricing"].map((item) => (
+          {["Features", "Pipeline"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase()}`}
@@ -33,9 +34,12 @@ export function Navbar() {
           ))}
         </nav>
 
-        <button className="rounded-full border border-border bg-secondary/50 px-5 py-2 text-sm font-medium text-foreground backdrop-blur-sm transition-all duration-200 hover:border-primary/50 hover:bg-secondary">
+        <Link
+          href="/onboarding"
+          className="rounded-full border border-border bg-secondary/50 px-5 py-2 text-sm font-medium text-foreground backdrop-blur-sm transition-all duration-200 hover:border-primary/50 hover:bg-secondary"
+        >
           Get Started
-        </button>
+        </Link>
       </div>
     </motion.header>
   )

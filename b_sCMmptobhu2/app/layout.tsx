@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} bg-background`}>
-      <body className="font-sans antialiased grain-overlay">
+      <body suppressHydrationWarning className="font-sans antialiased grain-overlay">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

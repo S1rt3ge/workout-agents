@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight, Activity } from "lucide-react"
 
@@ -24,10 +25,13 @@ export function CTASection() {
           <p className="max-w-md leading-relaxed text-muted-foreground">
             Join thousands of athletes training smarter with AI agents that understand progressive overload, periodization, and recovery.
           </p>
-          <button className="group inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[0_0_40px_rgba(0,196,140,0.3)] hover:scale-[1.02] active:scale-[0.98]">
+          <Link
+            href="/onboarding"
+            className="group inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[0_0_40px_rgba(0,196,140,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+          >
             Build my plan
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
+          </Link>
         </motion.div>
       </div>
 

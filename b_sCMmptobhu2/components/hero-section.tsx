@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { HeroScene } from "./hero-scene"
@@ -45,10 +46,13 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="flex flex-col items-center gap-4"
         >
-          <button className="group relative inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[0_0_40px_rgba(0,196,140,0.3)] hover:scale-[1.02] active:scale-[0.98]">
+          <Link
+            href="/onboarding"
+            className="group relative inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all duration-300 hover:shadow-[0_0_40px_rgba(0,196,140,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+          >
             Build my plan
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
+          </Link>
 
           <span className="text-xs text-muted-foreground/60">
             No credit card required

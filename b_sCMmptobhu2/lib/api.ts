@@ -6,6 +6,7 @@ export interface APIResponse<T> {
 }
 
 export interface GeneratePlanRequest {
+  request_id?: string
   user_id: string
   goals: string
   age: number
@@ -44,7 +45,34 @@ export interface FeedbackRequest {
   notes?: string
 }
 
+export interface SessionEvent {
+  request_id: string
+  agent: string
+  event: string
+  payload: Record<string, unknown>
+  timestamp: string
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+
+const EQUIPMENT_MAP: Record<string, string[]> = {
+  Barbell: ["barbell"],
+  Dumbbells: ["dumbbells"],
+  Rack: ["rack"],
+  Cables: ["cable_machine"],
+  "Resistance bands": ["resistance_band"],
+  "Bodyweight only": ["bodyweight"],
+  Kettlebell: ["kettlebell"],
+  Machines: ["machines"],
+}
+
+function normalizeEquipment(items: string[]): string[] {
+  return Array.from(
+    new Set(
+      items.flatMap((item) => EQUIPMENT_MAP[item] ?? [item.trim().toLowerCase().replace(/\s+/g, "_")])
+    )
+  )
+}
 
 function normalizePlan(raw: any): WorkoutPlan {
   return {
@@ -64,6 +92,7 @@ function normalizePlan(raw: any): WorkoutPlan {
 
 function mapGenerateRequestToBackend(req: GeneratePlanRequest) {
   return {
+    request_id: req.request_id,
     user_profile: {
       user_id: req.user_id,
       goals: req.goals
@@ -81,7 +110,7 @@ function mapGenerateRequestToBackend(req: GeneratePlanRequest) {
         minutes_per_session: req.session_duration_minutes,
         preferred_days: [],
       },
-      equipment: req.available_equipment,
+      equipment: normalizeEquipment(req.available_equipment),
       experience_level: req.fitness_level,
       notes: null,
     },
@@ -149,6 +178,16 @@ export async function generatePlan(
 
 export async function getPlan(planId: string): Promise<APIResponse<WorkoutPlan>> {
   return request<WorkoutPlan>(`/v1/plans/${planId}`, undefined, normalizePlan)
+}
+
+export async function getSessionEvents(
+  requestId: string
+): Promise<APIResponse<SessionEvent[]>> {
+  return request<SessionEvent[]>(`/v1/sessions/${requestId}/events`)
+}
+
+export function getSessionEventsStreamUrl(requestId: string): string {
+  return `${API_BASE_URL}/v1/sessions/${encodeURIComponent(requestId)}/events/stream`
 }
 
 export async function getUserPlans(

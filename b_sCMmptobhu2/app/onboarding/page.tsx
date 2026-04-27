@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 
-import { generatePlan, type GeneratePlanRequest } from "@/lib/api"
+import type { GeneratePlanRequest } from "@/lib/api"
 import { useAppStore } from "@/lib/store"
 
 import { Button } from "@/components/ui/button"
@@ -56,6 +56,7 @@ export default function OnboardingPage() {
   const router = useRouter()
   const userId = useAppStore((state) => state.userId)
   const setCurrentPlan = useAppStore((state) => state.setCurrentPlan)
+  const setPendingGenerateRequest = useAppStore((state) => state.setPendingGenerateRequest)
   const setIsGenerating = useAppStore((state) => state.setIsGenerating)
 
   const [step, setStep] = useState(1)
@@ -103,8 +104,10 @@ export default function OnboardingPage() {
     setErrorMessage(null)
     setIsSubmitting(true)
     setIsGenerating(true)
+    const requestId = crypto.randomUUID()
 
     const payload: GeneratePlanRequest = {
+      request_id: requestId,
       user_id: userId,
       goals: form.goals,
       age: form.age,
@@ -119,17 +122,10 @@ export default function OnboardingPage() {
       restrictions: splitCommaSeparated(form.restrictions),
     }
 
-    const response = await generatePlan(payload)
+    setCurrentPlan(null)
+    setPendingGenerateRequest(payload)
     setIsSubmitting(false)
-    setIsGenerating(false)
-
-    if (!response.success || !response.data) {
-      setErrorMessage(response.error ?? "Failed to generate plan")
-      return
-    }
-
-    setCurrentPlan(response.data)
-    router.push(`/generating?planId=${response.data.plan_id}`)
+    router.push(`/generating?requestId=${requestId}`)
   }
 
   const goBack = () => {
