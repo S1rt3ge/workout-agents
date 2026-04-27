@@ -1,17 +1,33 @@
-version: "3.9"
-
 services:
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
+    build: .
     ports:
       - "8000:8000"
+    env_file: .env
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_DEV_MODEL=qwen2.5:0.5b
+      - OLLAMA_EVAL_MODEL=qwen2.5:0.5b
+      - OLLAMA_TIMEOUT_SECONDS=180
+      - DISABLE_LLM_CALLS=true
     depends_on:
       - mongo
       - ollama
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./b_sCMmptobhu2
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
     restart: unless-stopped
 
   mongo:
@@ -25,7 +41,7 @@ services:
   ollama:
     image: ollama/ollama
     ports:
-      - "11434:11434"
+      - "11435:11434"
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped

@@ -1,5 +1,7 @@
 """Smoke test for importability and AgentState schema shape."""
 
+# ruff: noqa: E402
+
 from __future__ import annotations
 
 import importlib
@@ -96,6 +98,7 @@ def assert_state_schema() -> None:
         "settings": _DummySettings(),
         "ollama_client": object(),
         "exercise_repository": object(),
+        "medical_constraint_repository": object(),
         "workout_plan_repository": object(),
         "user_repository": object(),
         "session_log_repository": object(),

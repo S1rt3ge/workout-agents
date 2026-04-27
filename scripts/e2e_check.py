@@ -52,7 +52,7 @@ def run() -> int:
         "use_eval_model": False,
     }
 
-    timeout = httpx.Timeout(300.0)
+    timeout = httpx.Timeout(900.0)
 
     with httpx.Client(base_url=BASE_URL, timeout=timeout) as client:
         # 1) health

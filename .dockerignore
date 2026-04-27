@@ -1,5 +1,8 @@
-__pycache__
-.pytest_cache
 .git
 .env
+__pycache__
+.pytest_cache
 *.pyc
+*.pyo
+node_modules
+.venv

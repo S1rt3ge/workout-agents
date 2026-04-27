@@ -1,0 +1,7 @@
+services:
+  backend:
+    environment:
+      - DISABLE_LLM_CALLS=false
+      - OLLAMA_DEV_MODEL=qwen2.5:0.5b
+      - OLLAMA_EVAL_MODEL=qwen2.5:0.5b
+      - OLLAMA_TIMEOUT_SECONDS=180
