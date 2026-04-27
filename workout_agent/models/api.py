@@ -10,6 +10,7 @@ from workout_agent.models.domain import AgentError, ConstraintProfile, UserProfi
 class GeneratePlanRequest(BaseModel):
     """Payload for workout plan generation."""
 
+    request_id: str | None = None
     user_profile: UserProfile
     constraints: ConstraintProfile
     weeks: int = Field(default=4, ge=1, le=24)

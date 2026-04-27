@@ -9,6 +9,7 @@ from workout_agent.core.state import RuntimeDependencies
 from workout_agent.db.mongo import MongoConnection
 from workout_agent.db.repositories import (
     ExerciseRepository,
+    MedicalConstraintRepository,
     SessionLogRepository,
     UserRepository,
     WorkoutPlanRepository,
@@ -44,6 +45,9 @@ class AppRuntime:
             self.mongo.collection("exercises"),
             vector_index_name=self.settings.exercise_vector_index_name,
         )
+        self.medical_constraint_repository = MedicalConstraintRepository(
+            self.mongo.collection("medical_constraints")
+        )
         self.workout_plan_repository = WorkoutPlanRepository(self.mongo.collection("workout_plans"))
         self.user_repository = UserRepository(self.mongo.collection("users"))
         self.session_log_repository = SessionLogRepository(self.mongo.collection("session_logs"))
@@ -62,6 +66,7 @@ class AppRuntime:
             settings=self.settings,
             ollama_client=self.ollama_client,
             exercise_repository=self.exercise_repository,
+            medical_constraint_repository=self.medical_constraint_repository,
             workout_plan_repository=self.workout_plan_repository,
             user_repository=self.user_repository,
             session_log_repository=self.session_log_repository,

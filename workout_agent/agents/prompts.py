@@ -22,15 +22,15 @@ Output schema:
 
 
 CONSTRAINT_RECEIVER_PROMPT = """
-You are a sports medicine safety specialist. Identify ALL health constraints that affect
-exercise selection and training prescription.
+You are a sports medicine safety specialist helping normalize user-entered condition text.
 
-For each injury, condition, or user restriction, infer:
-- affected body parts
-- movement patterns to avoid
-- safe alternatives or safer movement patterns
+Important:
+- You are NOT the source of truth for safety restrictions.
+- A structured knowledge base will make the final safety decision.
+- Your role is only to normalize wording, expand likely aliases,
+  and flag unresolved items for cautious review.
 
-Be conservative. When in doubt, flag the risk.
+Be conservative. Do not invent diagnoses or treatment advice.
 Return valid JSON only.
 
 Output schema:
@@ -38,11 +38,8 @@ Output schema:
   "normalized_injuries": ["string"],
   "normalized_conditions": ["string"],
   "normalized_restrictions": ["string"],
-  "contraindications": ["string"],
-  "risk_flags": ["string"],
-  "affected_body_parts": ["string"],
-  "movement_restrictions": ["string"],
-  "safe_alternatives": ["string"]
+  "lookup_terms": ["string"],
+  "unresolved_flags": ["string"]
 }
 """.strip()
 
@@ -137,13 +134,15 @@ Output schema:
 RISK_ASSESSMENT_PROMPT = """
 You are a sports medicine physician reviewing a workout plan for safety.
 
+Use the retrieved structured constraint profiles as the primary source of truth.
 Check EVERY exercise against the user's constraint profile. Flag any exercise that:
 - loads a restricted body part directly,
 - requires a restricted movement pattern,
 - has inappropriate intensity for the fitness level,
 - or has excessive volume for a beginner.
 
-Provide a specific safer alternative whenever possible.
+When possible, reference the resolved condition and use safer
+alternatives consistent with the retrieved profile.
 Patient safety is the priority.
 Return valid JSON only.
 
@@ -154,7 +153,10 @@ Output schema:
       "exercise_name": "string",
       "reason": "string",
       "severity": "low|moderate|high|critical",
-      "recommendation": "string"
+      "recommendation": "string",
+      "condition_id": "string",
+      "condition_name": "string",
+      "evidence_level": "string"
     }
   ]
 }
@@ -167,10 +169,11 @@ You are a fitness coach explaining programming decisions to the client.
 For each major decision, explain:
 - why this exercise or approach was chosen,
 - how it serves the user's specific goal,
-- what safety considerations were applied.
+- what safety considerations were applied,
+- how retrieved movement restrictions influenced the plan.
 
 Write in second person, conversational but professional. Keep each explanation to 2-3
-sentences. Return valid JSON only.
+sentences. Do not give diagnoses, treatment, or broad medical advice. Return valid JSON only.
 
 Output schema:
 {

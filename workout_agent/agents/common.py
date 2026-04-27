@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any, TypeVar
 
 from pydantic import BaseModel
@@ -26,6 +27,14 @@ def unique_preserve_order(values: list[str]) -> list[str]:
         seen.add(lowered)
         result.append(normalized)
     return result
+
+
+def normalize_free_text(value: str) -> str:
+    """Normalize free text for simple matching and keyword lookup."""
+
+    lowered = value.strip().lower()
+    lowered = re.sub(r"[^a-z0-9\s]+", " ", lowered)
+    return re.sub(r"\s+", " ", lowered).strip()
 
 
 def resolve_model(state: AgentState) -> str:
@@ -76,6 +85,16 @@ async def call_structured_llm(
     runtime = state["runtime"]
     ollama_client = runtime["ollama_client"]
     model = resolve_model(state)
+    settings = runtime["settings"]
+
+    if settings.disable_llm_calls:
+        await log_agent_event(
+            state,
+            agent=agent,
+            event="llm_skipped",
+            payload={"reason": "DISABLE_LLM_CALLS", "model": model},
+        )
+        return None
 
     try:
         response_payload = await ollama_client.chat_json(

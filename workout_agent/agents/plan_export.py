@@ -6,7 +6,40 @@ from uuid import uuid4
 
 from workout_agent.agents.common import log_agent_event
 from workout_agent.core.state import AgentState, append_error
-from workout_agent.models.domain import SafetyAssessment, WorkoutPlan
+from workout_agent.models.domain import (
+    EvidenceSource,
+    ResolvedConstraintSummary,
+    SafetyAssessment,
+    WorkoutPlan,
+)
+
+
+def _build_constraint_summary(state: AgentState) -> list[ResolvedConstraintSummary]:
+    return [
+        ResolvedConstraintSummary(
+            condition_id=constraint.condition_id,
+            canonical_name=constraint.canonical_name,
+            condition_type=constraint.condition_type,
+            movement_restrictions=constraint.movement_restrictions,
+            safe_alternatives=constraint.safe_alternatives,
+            affected_body_parts=constraint.affected_body_parts,
+            evidence_level=constraint.evidence_level,
+        )
+        for constraint in state["resolved_constraints"]
+    ]
+
+
+def _build_evidence_references(state: AgentState) -> list[EvidenceSource]:
+    seen: set[tuple[str, str | None, int | None]] = set()
+    references: list[EvidenceSource] = []
+    for constraint in state["resolved_constraints"]:
+        for source in constraint.sources:
+            key = (source.title, source.url, source.year)
+            if key in seen:
+                continue
+            seen.add(key)
+            references.append(source)
+    return references
 
 
 async def run(state: AgentState) -> AgentState:
@@ -41,6 +74,8 @@ async def run(state: AgentState) -> AgentState:
         weekly_schedule=state["weekly_schedule"],
         progression_targets=state["progression_targets"],
         safety_assessment=safety_assessment,
+        constraint_summary=_build_constraint_summary(state),
+        evidence_references=_build_evidence_references(state),
         explanations=state["explanations"],
         status=status,
         metadata={
@@ -48,6 +83,7 @@ async def run(state: AgentState) -> AgentState:
             "risk_retry_count": state["risk_retry_count"],
             "error_count": len(state["errors"]),
             "blocked_exercise_count": len(state["blocked_exercise_ids"]),
+            "resolved_constraint_count": len(state["resolved_constraints"]),
         },
     )
 

@@ -9,9 +9,9 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from workout_agent.api.schemas import APIResponse, HealthResponse
+from workout_agent.api.routes import constraints_router, sessions_router, users_router
 from workout_agent.api.routes import router as plans_router
-from workout_agent.api.routes import users_router
+from workout_agent.api.schemas import APIResponse, HealthResponse
 from workout_agent.services.runtime import AppRuntime
 
 
@@ -43,6 +43,8 @@ app.add_middleware(
 )
 app.include_router(plans_router)
 app.include_router(users_router)
+app.include_router(constraints_router)
+app.include_router(sessions_router)
 
 
 @app.exception_handler(ValueError)

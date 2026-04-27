@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from workout_agent.agents.common import call_structured_llm, log_agent_event, unique_preserve_order
 from workout_agent.agents.prompts import INFORMATION_RECEIVER_PROMPT
@@ -17,6 +17,18 @@ class InformationReceiverOutput(BaseModel):
     training_style: str = "balanced"
     focus_areas: list[str] = Field(default_factory=list)
     intake_notes: str | None = None
+
+    @field_validator("normalized_goals", "focus_areas", mode="before")
+    @classmethod
+    def _coerce_string_list(cls, value: object) -> list[str]:
+        if value is None:
+            return []
+        if isinstance(value, str):
+            text = value.strip()
+            return [text] if text else []
+        if isinstance(value, list):
+            return [str(item).strip() for item in value if str(item).strip()]
+        return []
 
 
 def _fallback_information_output(

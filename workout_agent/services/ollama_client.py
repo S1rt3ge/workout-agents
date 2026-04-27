@@ -39,6 +39,7 @@ class OllamaClient:
             json={
                 "model": model,
                 "stream": False,
+                "format": "json",
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},

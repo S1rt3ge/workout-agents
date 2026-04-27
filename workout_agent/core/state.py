@@ -12,6 +12,7 @@ from workout_agent.models.domain import (
     ConstraintProfile,
     DecisionExplanation,
     Exercise,
+    MedicalConstraint,
     ProgressionTarget,
     SafetyAssessment,
     UserProfile,
@@ -26,6 +27,7 @@ class RuntimeDependencies(TypedDict):
     settings: Any
     ollama_client: Any
     exercise_repository: Any
+    medical_constraint_repository: Any
     workout_plan_repository: Any
     user_repository: Any
     session_log_repository: Any
@@ -40,6 +42,9 @@ class AgentState(TypedDict):
 
     user_profile: UserProfile | None
     constraints: ConstraintProfile | None
+    resolved_constraints: list[MedicalConstraint]
+    constraint_evidence: list[dict[str, Any]]
+    constraint_lookup_terms: list[str]
 
     plan_context: dict[str, Any]
     candidate_exercises: list[Exercise]
@@ -70,11 +75,14 @@ def build_initial_state(request: GeneratePlanRequest, runtime: RuntimeDependenci
 
     settings = runtime["settings"]
     return AgentState(
-        request_id=str(uuid4()),
+        request_id=request.request_id or str(uuid4()),
         requested_weeks=request.weeks,
         use_eval_model=request.use_eval_model,
         user_profile=request.user_profile,
         constraints=request.constraints,
+        resolved_constraints=[],
+        constraint_evidence=[],
+        constraint_lookup_terms=[],
         plan_context={},
         candidate_exercises=[],
         weekly_schedule=[],

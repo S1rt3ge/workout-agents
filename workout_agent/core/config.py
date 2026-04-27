@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     ollama_eval_model: str = Field(default="qwen2.5:35b", alias="OLLAMA_EVAL_MODEL")
     ollama_embedding_model: str = Field(default="nomic-embed-text", alias="OLLAMA_EMBEDDING_MODEL")
     ollama_timeout_seconds: float = Field(default=60.0, alias="OLLAMA_TIMEOUT_SECONDS")
+    disable_llm_calls: bool = Field(default=False, alias="DISABLE_LLM_CALLS")
 
     api_env: str = Field(default="development", alias="API_ENV")
     use_vector_search: bool = Field(default=False, alias="USE_VECTOR_SEARCH")

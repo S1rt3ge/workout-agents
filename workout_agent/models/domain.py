@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -50,6 +50,53 @@ class ConstraintProfile(BaseModel):
     chronic_conditions: list[str] = Field(default_factory=list)
     restrictions: list[str] = Field(default_factory=list)
     contraindications: list[str] = Field(default_factory=list)
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class EvidenceSource(BaseModel):
+    """Evidence metadata attached to a medical constraint."""
+
+    title: str
+    url: str | None = None
+    year: int | None = None
+    issuing_body: str | None = None
+    source_type: str | None = None
+    recommendation_strength: str | None = None
+    clinical_scope_note: str | None = None
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class MedicalConstraint(BaseModel):
+    """Structured training-safety knowledge for one condition or restriction."""
+
+    condition_id: str
+    canonical_name: str
+    aliases: list[str] = Field(default_factory=list)
+    condition_type: str
+    affected_body_parts: list[str] = Field(default_factory=list)
+    movement_restrictions: list[str] = Field(default_factory=list)
+    safe_alternatives: list[str] = Field(default_factory=list)
+    contraindicated_exercise_keywords: list[str] = Field(default_factory=list)
+    training_notes: str | None = None
+    risk_level: str = "moderate"
+    evidence_level: str | None = None
+    sources: list[EvidenceSource] = Field(default_factory=list)
+
+    model_config = ConfigDict(extra="ignore")
+
+
+class ResolvedConstraintSummary(BaseModel):
+    """Compact constraint summary attached to the final plan output."""
+
+    condition_id: str
+    canonical_name: str
+    condition_type: str
+    movement_restrictions: list[str] = Field(default_factory=list)
+    safe_alternatives: list[str] = Field(default_factory=list)
+    affected_body_parts: list[str] = Field(default_factory=list)
+    evidence_level: str | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -127,6 +174,9 @@ class SafetyIssue(BaseModel):
     reason: str
     severity: Literal["low", "moderate", "high", "critical"] = "moderate"
     recommendation: str | None = None
+    condition_id: str | None = None
+    condition_name: str | None = None
+    evidence_level: str | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -157,7 +207,7 @@ class AgentError(BaseModel):
     agent: str
     message: str
     details: str | None = None
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     model_config = ConfigDict(extra="forbid")
 
@@ -168,11 +218,13 @@ class WorkoutPlan(BaseModel):
     plan_id: str
     request_id: str
     user_id: str | None = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     weeks: int = Field(ge=1, le=52)
     weekly_schedule: list[WeekPlan] = Field(default_factory=list)
     progression_targets: list[ProgressionTarget] = Field(default_factory=list)
     safety_assessment: SafetyAssessment = Field(default_factory=SafetyAssessment)
+    constraint_summary: list[ResolvedConstraintSummary] = Field(default_factory=list)
+    evidence_references: list[EvidenceSource] = Field(default_factory=list)
     explanations: list[DecisionExplanation] = Field(default_factory=list)
     status: Literal["approved", "needs_review", "failed"] = "approved"
     metadata: dict[str, str | int | float | bool] = Field(default_factory=dict)
